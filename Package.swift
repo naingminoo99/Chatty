@@ -6,21 +6,18 @@ import PackageDescription
 let package = Package(
     name: "Chat",
     platforms: [
-        .iOS(.v16)
+        .iOS(.v16),
+        .macOS(.v13)
     ],
     products: [
         .library(
-            name: "ExyteChat",
-            targets: ["ExyteChat"]),
+            name: "Chatty",
+            targets: ["Chatty"]),
     ],
     dependencies: [
         .package(
             url: "https://github.com/siteline/swiftui-introspect",
-            from: "1.0.0"
-        ),
-        .package(
-            url: "https://github.com/exyte/MediaPicker.git",
-            from: "2.0.0"
+            from: "1.1.4"
         ),
         .package(
             url: "https://github.com/exyte/FloatingButton",
@@ -33,16 +30,15 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "ExyteChat",
+            name: "Chatty",
             dependencies: [
                 .product(name: "SwiftUIIntrospect", package: "swiftui-introspect"),
-                .product(name: "ExyteMediaPicker", package: "MediaPicker"),
                 .product(name: "FloatingButton", package: "FloatingButton"),
                 .product(name: "ActivityIndicatorView", package: "ActivityIndicatorView")
             ]
         ),
         .testTarget(
-            name: "ExyteChatTests",
-            dependencies: ["ExyteChat"]),
+            name: "ChattyTests",
+            dependencies: ["Chatty"]),
     ]
 )
