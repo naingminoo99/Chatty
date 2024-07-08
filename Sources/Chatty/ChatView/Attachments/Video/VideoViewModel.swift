@@ -24,12 +24,16 @@ final class VideoViewModel: ObservableObject {
     }
 
     func onStart() {
-        if player == nil {
-            self.player = AVPlayer(url: attachment.full)
-            self.player?.publisher(for: \.status)
-                .assign(to: &$status)
+        Task {
+            if player == nil {
+                let vdoUrl = try! await loadURL(key: attachment.full)
+                self.player = AVPlayer(url: vdoUrl)
+                self.player?.publisher(for: \.status)
+                    .receive(on: DispatchQueue.main) // Ensure updates are on the main thread
+                    .assign(to: &$status)
 
-            NotificationCenter.default.addObserver(self, selector: #selector(finishVideo), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: nil)
+                NotificationCenter.default.addObserver(self, selector: #selector(finishVideo), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: nil)
+            }
         }
     }
 
