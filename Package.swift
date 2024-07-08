@@ -27,6 +27,14 @@ let package = Package(
             url: "https://github.com/exyte/ActivityIndicatorView",
             from: "1.0.0"
         ),
+        .package(
+            url: "https://github.com/onevcat/Kingfisher",
+            from: "7.0.0"
+        ),
+        .package(
+            url: "https://github.com/aws-amplify/amplify-swift",
+            from: "2.35.0"
+        )
     ],
     targets: [
         .target(
@@ -34,7 +42,9 @@ let package = Package(
             dependencies: [
                 .product(name: "SwiftUIIntrospect", package: "swiftui-introspect"),
                 .product(name: "FloatingButton", package: "FloatingButton"),
-                .product(name: "ActivityIndicatorView", package: "ActivityIndicatorView")
+                .product(name: "ActivityIndicatorView", package: "ActivityIndicatorView"),
+                .product(name: "Kingfisher", package: "Kingfisher"),
+                .product(name: "Amplify", package: "amplify-swift")
             ]
         ),
         .testTarget(

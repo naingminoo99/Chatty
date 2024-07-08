@@ -5,6 +5,7 @@
 import Foundation
 import Combine
 import AVKit
+import Amplify
 
 // TODO: Create option "download video before playing"
 final class VideoViewModel: ObservableObject {
@@ -63,4 +64,16 @@ final class VideoViewModel: ObservableObject {
         player?.seek(to: CMTime(seconds: 0, preferredTimescale: 10))
         isPlaying = false
     }
+    
+    func loadURL(key: String) async throws -> URL {
+        // Key is js a name so add your message media patch here
+        let keyWithPath = "messageVideos/" + key
+        do {
+            let presign = try await Amplify.Storage.getURL(key: keyWithPath)
+            return presign
+        } catch(let error) {
+            throw error
+        }
+    }
+
 }

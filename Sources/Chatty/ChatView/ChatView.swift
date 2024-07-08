@@ -8,9 +8,8 @@
 import SwiftUI
 import FloatingButton
 import SwiftUIIntrospect
-import ExyteMediaPicker
+import PhotosUI
 
-public typealias MediaPickerParameters = SelectionParamsHolder
 
 public enum ChatType {
     case chat // input view and the latest message at the bottom
@@ -40,7 +39,6 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
 
     @Environment(\.safeAreaInsets) private var safeAreaInsets
     @Environment(\.chatTheme) private var theme
-    @Environment(\.mediaPickerTheme) private var pickerTheme
 
     // MARK: - Parameters
 
@@ -63,10 +61,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
     var avatarSize: CGFloat = 32
     var messageUseMarkdown: Bool = false
     var showMessageMenuOnLongPress: Bool = true
-    var showNetworkConnectionProblem: Bool = false
     var tapAvatarClosure: TapAvatarClosure?
-    var mediaPickerSelectionParameters: MediaPickerParameters?
-    var orientationHandler: MediaPickerOrientationHandler = {_ in}
     var chatTitle: String?
     var showMessageTimeView = true
     var messageFont = UIFontMetrics.default.scaledFont(for: UIFont.systemFont(ofSize: 15))
@@ -107,7 +102,7 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
 
     public var body: some View {
         VStack {
-            if showNetworkConnectionProblem, !networkMonitor.isConnected {
+            if !networkMonitor.isConnected {
                 waitingForNetwork
             }
 
@@ -155,15 +150,33 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
                 .ignoresSafeArea()
             }
         }
-        .fullScreenCover(isPresented: $inputViewModel.showPicker) {
-            AttachmentsEditor(inputViewModel: inputViewModel, inputViewBuilder: inputViewBuilder, chatTitle: chatTitle, messageUseMarkdown: messageUseMarkdown, orientationHandler: orientationHandler, mediaPickerSelectionParameters: mediaPickerSelectionParameters, availableInput: availablelInput)
-                .environmentObject(globalFocusState)
-        }
+        .photosPicker(
+            isPresented: $inputViewModel.showPicker,
+            selection: $inputViewModel.photoPickerItems,
+            maxSelectionCount: 10,
+            selectionBehavior: .ordered,
+            matching: inputViewModel.mediaPickerFilter,
+            preferredItemEncoding: .current,
+            photoLibrary: .shared()
+        )
         .onChange(of: inputViewModel.showPicker) {
             if $0 {
                 globalFocusState.focus = nil
+            } else {
+                if inputViewModel.photoPickerItems.count > 0 {
+                    inputViewModel.send()
+                }
             }
         }
+//        .onChange(of: inputViewModel.photoPickerItems) { value in
+//            Task {
+//                do {
+//                    try await loadPhotos(with: value)
+//                } catch let newError {
+//                    print(newError.localizedDescription)
+//                }
+//            }
+//        }
         .environmentObject(keyboardState)
     }
 
@@ -174,7 +187,14 @@ public struct ChatView<MessageContent: View, InputViewContent: View>: View {
                 .frame(height: 1)
             HStack {
                 Spacer()
-                Image("waiting", bundle: .current)
+                if #available(iOS 17.0, *) {
+                    Image(systemName: "wifi.exclamationmark.circle.fill")
+                        .symbolRenderingMode(.palette)
+                        .foregroundStyle(theme.colors.mainBackground, Color.yellow)
+                        .symbolEffect(.pulse)
+                } else {
+                    Image(systemName: "wifi.exclamationmark.circle.fill")
+                }
                 Text("Waiting for network")
                 Spacer()
             }
@@ -406,6 +426,24 @@ private extension ChatView {
 
 public extension ChatView {
 
+    // MARK: Methods
+    
+    func loadPhotos(with pickers: [PhotosPickerItem]) async throws {
+        let oldPhotos = inputViewModel.attachments.medias
+        var newPhotos: [PickedMedia] = []
+        
+        for picker in pickers {
+            if let foundPhoto = oldPhotos.first(where: { $0.id == picker.itemIdentifier }) {
+                newPhotos.append(foundPhoto)
+            } else {
+                let item = try await PickedMedia.loadData(picker)
+                newPhotos.append(item)
+            }
+            inputViewModel.attachments.medias = newPhotos
+        }
+        inputViewModel.attachments.medias = newPhotos
+    }
+
     func chatType(_ type: ChatType) -> ChatView {
         var view = self
         view.type = type
@@ -436,34 +474,9 @@ public extension ChatView {
         return view
     }
 
-    func showNetworkConnectionProblem(_ show: Bool) -> ChatView {
-        var view = self
-        view.showNetworkConnectionProblem = show
-        return view
-    }
-
     func tapAvatarClosure(_ closure: @escaping TapAvatarClosure) -> ChatView {
         var view = self
         view.tapAvatarClosure = closure
-        return view
-    }
-
-    func assetsPickerLimit(assetsPickerLimit: Int) -> ChatView {
-        var view = self
-        view.mediaPickerSelectionParameters = MediaPickerParameters()
-        view.mediaPickerSelectionParameters?.selectionLimit = assetsPickerLimit
-        return view
-    }
-
-    func setMediaPickerSelectionParameters(_ params: MediaPickerParameters) -> ChatView {
-        var view = self
-        view.mediaPickerSelectionParameters = params
-        return view
-    }
-
-    func orientationHandler(orientationHandler: @escaping MediaPickerOrientationHandler) -> ChatView {
-        var view = self
-        view.orientationHandler = orientationHandler
         return view
     }
 

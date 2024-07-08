@@ -139,11 +139,12 @@ extension Array where Element == Attachment {
 
 extension Attachment {
     static func randomImage() -> Attachment {
-        Attachment(id: UUID().uuidString, url: URL(string: "https://placeimg.com/640/480/sepia")!, type: .image)
+        Attachment(id: UUID().uuidString, key: "images/img.jpg", type: .image)
+        
     }
     // TODO get video, not image
     static func randomVideo() -> Attachment {
-        Attachment(id: UUID().uuidString, url: URL(string: "https://placeimg.com/640/480/sepia")!, type: .video)
+        Attachment(id: UUID().uuidString, key: "videos/video", type: .video)
     }
 }
 #endif

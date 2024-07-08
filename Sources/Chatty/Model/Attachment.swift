@@ -3,7 +3,6 @@
 //
 
 import Foundation
-import ExyteMediaPicker
 
 public enum AttachmentType: String, Codable {
     case image
@@ -18,30 +17,30 @@ public enum AttachmentType: String, Codable {
         }
     }
 
-    public init(mediaType: MediaType) {
+    public init(mediaType: PickedMediaType) {
         switch mediaType {
-        case .image:
-            self = .image
-        default:
+        case .video:
             self = .video
+        default:
+            self = .image
         }
     }
 }
 
 public struct Attachment: Codable, Identifiable, Hashable {
     public let id: String
-    public let thumbnail: URL
-    public let full: URL
+    public let thumbnail: String
+    public let full: String
     public let type: AttachmentType
-
-    public init(id: String, thumbnail: URL, full: URL, type: AttachmentType) {
+    
+    public init(id: String, thumbnail: String, full: String, type: AttachmentType) {
         self.id = id
         self.thumbnail = thumbnail
         self.full = full
         self.type = type
     }
 
-    public init(id: String, url: URL, type: AttachmentType) {
-        self.init(id: id, thumbnail: url, full: url, type: type)
+    public init(id: String, key: String, type: AttachmentType) {
+        self.init(id: id, thumbnail: key, full: key, type: type)
     }
 }

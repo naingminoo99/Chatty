@@ -115,7 +115,6 @@ struct MessageView: View {
         }
         .padding(.top, topPadding)
         .padding(.bottom, bottomPadding)
-        .padding(.trailing, message.user.isCurrentUser ? MessageView.horizontalNoAvatarPadding : 0)
         .padding(message.user.isCurrentUser ? .leading : .trailing, MessageView.horizontalBubblePadding)
         .frame(maxWidth: UIScreen.main.bounds.width, alignment: message.user.isCurrentUser ? .trailing : .leading)
     }
@@ -176,7 +175,7 @@ struct MessageView: View {
     var avatarView: some View {
         Group {
             if showAvatar {
-                AvatarView(url: message.user.avatarURL, avatarSize: avatarSize)
+                AvatarView(avatarKey: message.user.avatarKey, avatarSize: avatarSize)
                     .contentShape(Circle())
                     .onTapGesture {
                         tapAvatarClosure?(message.user, message.id)
@@ -296,8 +295,8 @@ extension View {
 
 #if DEBUG
 struct MessageView_Preview: PreviewProvider {
-    static let stan = User(id: "stan", name: "Stan", avatarURL: nil, isCurrentUser: false)
-    static let john = User(id: "john", name: "John", avatarURL: nil, isCurrentUser: true)
+    static let stan = User(id: "stan", name: "Stan", avatarKey: "nil", isCurrentUser: false)
+    static let john = User(id: "john", name: "John", avatarKey: "nil", isCurrentUser: true)
 
     static private var shortMessage = "Hi, buddy!"
     static private var longMessage = "Hello hello hello hello hello hello hello hello hello hello hello hello hello\n hello hello hello hello d d d d d d d d"

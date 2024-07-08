@@ -73,29 +73,6 @@ public struct Message: Identifiable, Hashable {
         self.replyMessage = replyMessage
     }
 
-    public static func makeMessage(
-        id: String,
-        user: User,
-        status: Status? = nil,
-        draft: DraftMessage) async -> Message {
-            let attachments = await draft.medias.asyncCompactMap { media -> Attachment? in
-                guard let thumbnailURL = await media.getThumbnailURL() else {
-                    return nil
-                }
-
-                switch media.type {
-                case .image:
-                    return Attachment(id: UUID().uuidString, url: thumbnailURL, type: .image)
-                case .video:
-                    guard let fullURL = await media.getURL() else {
-                        return nil
-                    }
-                    return Attachment(id: UUID().uuidString, thumbnail: thumbnailURL, full: fullURL, type: .video)
-                }
-            }
-
-            return Message(id: id, user: user, status: status, createdAt: draft.createdAt, text: draft.text, attachments: attachments, recording: draft.recording, replyMessage: draft.replyMessage)
-        }
 }
 
 extension Message {

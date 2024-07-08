@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import ExyteMediaPicker
 
 public enum InputViewStyle {
     case message
@@ -75,7 +74,7 @@ public enum AvailableInputType {
 
 public struct InputViewAttachments {
     public var text: String = ""
-    public var medias: [Media] = []
+    public var medias: [PickedMedia] = []
     public var recording: Recording?
     public var replyMessage: ReplyMessage?
 }
@@ -83,7 +82,6 @@ public struct InputViewAttachments {
 struct InputView: View {
 
     @Environment(\.chatTheme) private var theme
-    @Environment(\.mediaPickerTheme) private var pickerTheme
 
     @ObservedObject var viewModel: InputViewModel
     var inputFieldId: UUID
@@ -148,11 +146,7 @@ struct InputView: View {
                     attachButton
                 }
             case .signature:
-                if viewModel.mediaPickerMode == .cameraSelection {
-                    addButton
-                } else {
-                    Color.clear.frame(width: 12, height: 1)
-                }
+                Color.clear.frame(width: 12, height: 1)
             }
         }
     }
@@ -258,7 +252,7 @@ struct InputView: View {
                     Spacer()
 
                     if let first = message.attachments.first {
-                        AsyncImageView(url: first.thumbnail)
+                        LazyImageView(key: first.thumbnail)
                             .viewSize(30)
                             .cornerRadius(4)
                             .padding(.trailing, 16)
@@ -486,7 +480,7 @@ struct InputView: View {
         case .message:
             return theme.colors.mainBackground
         case .signature:
-            return pickerTheme.main.albumSelectionBackground
+            return theme.colors.inputDarkContextBackground
         }
     }
 

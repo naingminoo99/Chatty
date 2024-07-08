@@ -8,8 +8,6 @@ import SwiftUI
 struct FullscreenMediaPages: View {
 
     @Environment(\.chatTheme) private var theme
-    @Environment(\.mediaPickerTheme) var pickerTheme
-
     @StateObject var viewModel: FullscreenMediaPagesViewModel
     var safeAreaInsets: EdgeInsets
     var onClose: () -> Void

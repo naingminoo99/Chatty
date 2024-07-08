@@ -3,19 +3,18 @@
 //
 
 import Foundation
-import ExyteMediaPicker
 
 public struct DraftMessage {
     public var id: String?
     public let text: String
-    public let medias: [Media]
+    public let medias: [PickedMedia]
     public let recording: Recording?
     public let replyMessage: ReplyMessage?
     public let createdAt: Date
 
     public init(id: String? = nil, 
                 text: String,
-                medias: [Media],
+                medias: [PickedMedia],
                 recording: Recording?,
                 replyMessage: ReplyMessage?,
                 createdAt: Date) {

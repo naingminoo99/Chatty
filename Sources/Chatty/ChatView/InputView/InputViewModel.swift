@@ -4,18 +4,14 @@
 
 import Foundation
 import Combine
-import ExyteMediaPicker
+import _PhotosUI_SwiftUI
 
 final class InputViewModel: ObservableObject {
-
+    
     @Published var attachments = InputViewAttachments()
     @Published var state: InputViewState = .empty
-
-    @Published var showPicker = false
-    @Published var mediaPickerMode = MediaPickerMode.photos
-
     @Published var showActivityIndicator = false
-
+    
     var recordingPlayer: RecordingPlayer?
     var didSendMessage: ((DraftMessage) -> Void)?
 
@@ -24,6 +20,12 @@ final class InputViewModel: ObservableObject {
     private var recordPlayerSubscription: AnyCancellable?
     private var subscriptions = Set<AnyCancellable>()
 
+    // Media Picker
+    @Published var photoPickerItems: [PhotosPickerItem] = []
+    @Published var showPicker = false
+    @Published var mediaPickerFilter: PHPickerFilter?
+
+    
     func onStart() {
         subscribeValidation()
         subscribePicker()
@@ -34,9 +36,12 @@ final class InputViewModel: ObservableObject {
     }
 
     func reset() {
-        showPicker = false
-        attachments = InputViewAttachments()
-        subscribeValidation()
+        DispatchQueue.main.async { [weak self] in
+            self?.attachments = InputViewAttachments()
+            self?.photoPickerItems = []
+            self?.showPicker = false
+            self?.state = .empty
+        }
     }
 
     func send() {
@@ -55,13 +60,23 @@ final class InputViewModel: ObservableObject {
     func inputViewActionInternal(_ action: InputViewAction) {
         switch action {
         case .photo:
-            mediaPickerMode = .photos
+            mediaPickerFilter = .images
             showPicker = true
+            
+            // TODO: fix this
+//        case .video:
+//            mediaPickerFilter = .videos
+//            showPicker = true
+//        case .media:
+//            mediaPickerFilter = .any(of: [.images, .videos])
+//            showPicker = true
+            
+//        TODO: Camera
         case .add:
-            mediaPickerMode = .camera
-        case .camera:
-            mediaPickerMode = .camera
             showPicker = true
+        case .camera:
+            showPicker = true
+            
         case .send:
             send()
         case .recordAudioTap:
@@ -141,6 +156,7 @@ private extension InputViewModel {
             .sink { [weak self] value in
                 if !value {
                     self?.attachments.medias = []
+//                    self?.photoPickerItems = []
                 }
             }
             .store(in: &subscriptions)
@@ -160,27 +176,14 @@ private extension InputViewModel {
 
 private extension InputViewModel {
     
-    func mapAttachmentsForSend() -> AnyPublisher<[Attachment], Never> {
-        attachments.medias.publisher
+    func mapAttachmentsForSend() -> AnyPublisher<[PickedMedia], Never> {
+        return photoPickerItems.publisher
             .receive(on: DispatchQueue.global())
             .asyncMap { media in
-                guard let thumbnailURL = await media.getThumbnailURL() else {
-                    return nil
-                }
-
-                switch media.type {
-                case .image:
-                    return Attachment(id: UUID().uuidString, url: thumbnailURL, type: .image)
-                case .video:
-                    guard let fullURL = await media.getURL() else {
-                        return nil
-                    }
-                    return Attachment(id: UUID().uuidString, thumbnail: thumbnailURL, full: fullURL, type: .video)
-                }
+                let item = try! await PickedMedia.loadData(media)
+                return item
             }
-            .compactMap {
-                $0
-            }
+            .compactMap { $0 }
             .collect()
             .eraseToAnyPublisher()
     }
@@ -188,19 +191,20 @@ private extension InputViewModel {
     func sendMessage() -> AnyCancellable {
         showActivityIndicator = true
         return mapAttachmentsForSend()
-            .compactMap { [attachments] _ in
+            .receive(on: DispatchQueue.global())
+            .compactMap { [attachments] pickedMedia in
                 DraftMessage(
                     text: attachments.text,
-                    medias: attachments.medias,
+                    medias: attachments.medias + pickedMedia,
                     recording: attachments.recording,
                     replyMessage: attachments.replyMessage,
                     createdAt: Date()
                 )
             }
             .sink { [weak self] draft in
-                self?.didSendMessage?(draft)
-                DispatchQueue.main.async { [weak self] in
+                DispatchQueue.main.async { [self, draft] in
                     self?.showActivityIndicator = false
+                    self?.didSendMessage?(draft)
                     self?.reset()
                 }
             }

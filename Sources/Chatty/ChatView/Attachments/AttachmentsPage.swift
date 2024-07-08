@@ -13,16 +13,8 @@ struct AttachmentsPage: View {
 
     var body: some View {
         if attachment.type == .image {
-            CachedAsyncImage(url: attachment.full, urlCache: .imageCache) { phase in
-                switch phase {
-                case let .success(image):
-                    image
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                default:
-                    ActivityIndicator()
-                }
-            }
+            let keyPath = "messageImages/" + attachment.full
+            LazyImageView(key: keyPath)
         } else if attachment.type == .video {
             VideoView(viewModel: VideoViewModel(attachment: attachment))
         } else {
