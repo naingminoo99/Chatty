@@ -18,28 +18,28 @@ public struct PickedMedia: Identifiable, Equatable {
     public let videoURL: URL?
     public let type: PickedMediaType
     
-    init(id: String?) {
+    public init(id: String?) {
         self.id = id
         self.imageData = nil
         self.videoURL = nil
         self.type = .photo
     }
     
-    init(id: String?, url: URL) {
+    public init(id: String?, url: URL) {
         self.id = id
         self.imageData = nil
         self.videoURL = url
         self.type = .video
     }
     
-    init(id: String?, data: Data) {
+    public init(id: String?, data: Data) {
         self.id = id
         self.imageData = data
         self.videoURL = nil
         self.type = .photo
     }
     
-    func getData() async -> Data? {
+    public func getData() async -> Data? {
         switch self.type {
         case .photo:
             if let data = self.imageData {
@@ -55,7 +55,7 @@ public struct PickedMedia: Identifiable, Equatable {
         }
     }
     
-    func getThumbnailData() async -> Data? {
+    public func getThumbnailData() async -> Data? {
         switch self.type {
         case .photo:
             let data = await self.getData()
@@ -67,14 +67,14 @@ public struct PickedMedia: Identifiable, Equatable {
         }
     }
     
-    func getURL() -> URL? {
+    public func getURL() -> URL? {
         if let vdoUrl = videoURL {
             return vdoUrl
         }
         return nil
     }
     
-    func getImageData() -> ImageData? {
+    public func getImageData() -> ImageData? {
         if let data = self.imageData {
             return ImageData(data: data)
         } else {

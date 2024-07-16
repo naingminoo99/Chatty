@@ -8,13 +8,13 @@
 import SwiftUI
 
 #if os(macOS)
-typealias ImageData = NSImage
+public typealias ImageData = NSImage
 #else
-typealias ImageData = UIImage
+public typealias ImageData = UIImage
 #endif
 
 extension Image {
-  init(imageData: ImageData) {
+  public init(imageData: ImageData) {
     #if os(macOS)
     self.init(nsImage: imageData)
     #else
