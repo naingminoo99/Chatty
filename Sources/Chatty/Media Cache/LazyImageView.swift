@@ -17,8 +17,7 @@ struct LazyImageView: View {
     var contentMode: SwiftUI.ContentMode = .fill
     var placeholderName: String?
     
-    @State private var url: URL?
-    @State private var isLoading = true
+    @State private var viewModel: ViewModel
     
     init(key: String,
          width: CGFloat? = nil,
@@ -30,12 +29,23 @@ struct LazyImageView: View {
         self.height = height
         self.contentMode = contentMode
         self.placeholderName = placeholderName
+        self._viewModel = State(initialValue: ViewModel(key: key))
     }
     
     var body: some View {
         Group {
-            if let url = url {
-                KFImage(url)
+            switch viewModel.viewState {
+            case .loading:
+                ProgressView()
+                    .frame(width: width, height: height, alignment: .center)
+            case .error(let error):
+                Image(placeholderName ?? "placeholder")
+                    .resizable()
+                    .aspectRatio(contentMode: contentMode)
+                    .frame(width: width, height: height, alignment: .center)
+                    .clipped()
+            case .loaded:
+                KFImage(viewModel.url)
                     .resizable()
                     .placeholder { _ in
                         ProgressView()
@@ -46,44 +56,8 @@ struct LazyImageView: View {
                     .aspectRatio(contentMode: contentMode)
                     .frame(width: width, height: height)
                     .clipped()
-            } else if isLoading {
-                ProgressView()
-                    .frame(width: width, height: height, alignment: .center)
-            } else {
-                Image(placeholderName ?? "placeholder")
-                    .resizable()
-                    .aspectRatio(contentMode: contentMode)
-                    .frame(width: width, height: height, alignment: .center)
-                    .clipped()
-            }
-        }
-        .onAppear {
-            if url == nil {
-                loadURL()
             }
         }
     }
     
-    // load URL
-    func loadURL() {
-        Task {
-            do {
-                let presign = try await Amplify.Storage.getURL(key: key)
-                DispatchQueue.main.async {
-                    withAnimation {
-                        self.url = presign
-                        self.isLoading = false
-                    }
-                }
-            } catch {
-                DispatchQueue.main.async {
-                    self.isLoading = false
-                }
-                // Handle the error when fetching the URL
-                if let amplifyError = error as? AmplifyError {
-                    print("AmplifyError details: \(amplifyError.errorDescription)")
-                }
-            }
-        }
-    }
 }
