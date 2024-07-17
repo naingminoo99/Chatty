@@ -7,13 +7,13 @@ import Foundation
 public struct User: Codable, Identifiable, Hashable {
     public let id: String
     public let name: String
-    public let avatarKey: String
+    public let avatarURL: URL?
     public let isCurrentUser: Bool
 
-    public init(id: String, name: String, avatarKey: String, isCurrentUser: Bool) {
+    public init(id: String, name: String, avatarURL: URL?, isCurrentUser: Bool) {
         self.id = id
         self.name = name
-        self.avatarKey = avatarKey
+        self.avatarURL = avatarURL
         self.isCurrentUser = isCurrentUser
     }
 }

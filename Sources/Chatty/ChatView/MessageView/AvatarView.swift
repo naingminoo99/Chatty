@@ -6,11 +6,17 @@ import SwiftUI
 
 struct AvatarView: View {
 
-    let avatarKey: String
+    let url: URL?
     let avatarSize: CGFloat
 
     var body: some View {
-        LazyImageView(key: avatarKey)
+        CachedAsyncImage(url: url, urlCache: .imageCache) { image in
+            image
+                .resizable()
+                .scaledToFill()
+        } placeholder: {
+            Rectangle().fill(Color.gray)
+        }
         .viewSize(avatarSize)
         .clipShape(Circle())
     }
@@ -19,7 +25,7 @@ struct AvatarView: View {
 struct AvatarView_Previews: PreviewProvider {
     static var previews: some View {
         AvatarView(
-            avatarKey: "avatar",
+            url: URL(string: "https://placeimg.com/640/480/sepia"),
             avatarSize: 32
         )
     }

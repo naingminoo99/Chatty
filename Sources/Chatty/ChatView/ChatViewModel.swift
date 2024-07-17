@@ -5,17 +5,19 @@
 import Foundation
 import Combine
 
-public typealias ChatPaginationClosure = (Message) -> Void
-
 final class ChatViewModel: ObservableObject {
-    
+
     @Published private(set) var fullscreenAttachmentItem: Optional<Attachment> = nil
     @Published var fullscreenAttachmentPresented = false
 
     @Published var messageMenuRow: MessageRow?
 
-    public var didSendMessage: (DraftMessage) -> Void = {_ in}
-    
+    let inputFieldId = UUID()
+
+    var didSendMessage: (DraftMessage) -> Void = {_ in}
+    var inputViewModel: InputViewModel?
+    var globalFocusState: GlobalFocusState?
+
     func presentAttachmentFullScreen(_ attachment: Attachment) {
         fullscreenAttachmentItem = attachment
         fullscreenAttachmentPresented = true
@@ -28,5 +30,26 @@ final class ChatViewModel: ObservableObject {
 
     func sendMessage(_ message: DraftMessage) {
         didSendMessage(message)
+    }
+
+    func messageMenuAction() -> (Message, DefaultMessageMenuAction) -> Void {
+        { [weak self] message, action in
+            DispatchQueue.main.async {
+                self?.messageMenuActionInternal(message: message, action: action)
+            }
+        }
+    }
+
+    @MainActor
+    func messageMenuActionInternal(message: Message, action: DefaultMessageMenuAction) {
+        switch action {
+        case .reply:
+            inputViewModel?.attachments.replyMessage = message.toReplyMessage()
+            globalFocusState?.focus = .uuid(inputFieldId)
+        case .edit(let saveClosure):
+            inputViewModel?.text = message.text
+            inputViewModel?.edit(saveClosure)
+            globalFocusState?.focus = .uuid(inputFieldId)
+        }
     }
 }

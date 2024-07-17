@@ -7,7 +7,8 @@ import Combine
 import _PhotosUI_SwiftUI
 
 final class InputViewModel: ObservableObject {
-    
+
+    @Published var text = ""
     @Published var attachments = InputViewAttachments()
     @Published var state: InputViewState = .empty
     @Published var showActivityIndicator = false
@@ -16,6 +17,8 @@ final class InputViewModel: ObservableObject {
     var didSendMessage: ((DraftMessage) -> Void)?
 
     private var recorder = Recorder()
+
+    private var saveEditingClosure: ((String) -> Void)?
 
     private var recordPlayerSubscription: AnyCancellable?
     private var subscriptions = Set<AnyCancellable>()
@@ -41,6 +44,10 @@ final class InputViewModel: ObservableObject {
             self?.photoPickerItems = []
             self?.showPicker = false
             self?.state = .empty
+            self?.text = ""
+            self?.saveEditingClosure = nil
+            self?.attachments = InputViewAttachments()
+            self?.subscribeValidation()
         }
     }
 
@@ -51,13 +58,18 @@ final class InputViewModel: ObservableObject {
             .store(in: &subscriptions)
     }
 
+    func edit(_ closure: @escaping (String) -> Void) {
+        saveEditingClosure = closure
+        state = .editing
+    }
+
     func inputViewAction() -> (InputViewAction) -> Void {
         { [weak self] in
             self?.inputViewActionInternal($0)
         }
     }
 
-    func inputViewActionInternal(_ action: InputViewAction) {
+    private func inputViewActionInternal(_ action: InputViewAction) {
         switch action {
         case .photo:
             mediaPickerFilter = .images
@@ -106,10 +118,15 @@ final class InputViewModel: ObservableObject {
         case .pauseRecord:
             state = .pausedRecording
             recordingPlayer?.pause()
+        case .saveEdit:
+            saveEditingClosure?(text)
+            reset()
+        case .cancelEdit:
+            reset()
         }
     }
 
-    func recordAudio() {
+    private func recordAudio() {
         if recorder.isRecording {
             return
         }
@@ -134,9 +151,10 @@ private extension InputViewModel {
     func validateDraft() {
         DispatchQueue.main.async { [weak self] in
             guard let self = self else { return }
-            if !self.attachments.text.isEmpty || !self.attachments.medias.isEmpty {
+            guard state != .editing else { return } // special case
+            if !self.text.isEmpty || !self.attachments.medias.isEmpty {
                 self.state = .hasTextOrMedia
-            } else if self.attachments.text.isEmpty,
+            } else if self.text.isEmpty,
                       self.attachments.medias.isEmpty,
                       self.attachments.recording == nil {
                 self.state = .empty
@@ -149,6 +167,11 @@ private extension InputViewModel {
             self?.validateDraft()
         }
         .store(in: &subscriptions)
+
+        $text.sink { [weak self] _ in
+            self?.validateDraft()
+        }
+        .store(in: &subscriptions)
     }
 
     func subscribePicker() {
@@ -156,7 +179,6 @@ private extension InputViewModel {
             .sink { [weak self] value in
                 if !value {
                     self?.attachments.medias = []
-//                    self?.photoPickerItems = []
                 }
             }
             .store(in: &subscriptions)
@@ -194,17 +216,17 @@ private extension InputViewModel {
             .receive(on: DispatchQueue.global())
             .compactMap { [attachments] pickedMedia in
                 DraftMessage(
-                    text: attachments.text,
-                    medias: attachments.medias + pickedMedia,
+                    text: self.text,
+                    medias: attachments.medias,
                     recording: attachments.recording,
                     replyMessage: attachments.replyMessage,
                     createdAt: Date()
                 )
             }
             .sink { [weak self] draft in
-                DispatchQueue.main.async { [self, draft] in
+                self?.didSendMessage?(draft)
+                DispatchQueue.main.async { [weak self] in
                     self?.showActivityIndicator = false
-                    self?.didSendMessage?(draft)
                     self?.reset()
                 }
             }
