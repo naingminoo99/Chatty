@@ -33,30 +33,16 @@ struct LazyImageView: View {
     }
     
     var body: some View {
-        Group {
-            switch viewModel.viewState {
-            case .loading:
+        KFImage.url(viewModel.url, cacheKey: key)
+            .resizable()
+            .placeholder { _ in
                 ProgressView()
-                    .frame(width: width, height: height, alignment: .center)
-            case .error(let error):
-                Image(placeholderName ?? "placeholder")
-                    .resizable()
-                    .aspectRatio(contentMode: contentMode)
-                    .frame(width: width, height: height, alignment: .center)
-                    .clipped()
-            case .loaded:
-                KFImage.url(viewModel.url, cacheKey: key)
-                    .resizable()
-                    .placeholder { _ in
-                        ProgressView()
-                    }
-                    .onFailureImage(UIImage(named: placeholderName ?? "placeholder"))
-                    .fade(duration: 0.25)
-                    .aspectRatio(contentMode: contentMode)
-                    .frame(width: width, height: height)
-                    .clipped()
             }
-        }
+            .onFailureImage(UIImage(named: placeholderName ?? "placeholder"))
+            .fade(duration: 0.25)
+            .aspectRatio(contentMode: contentMode)
+            .frame(width: width, height: height)
+            .clipped()
     }
     
 }
