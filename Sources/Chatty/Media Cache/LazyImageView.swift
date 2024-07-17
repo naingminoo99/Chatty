@@ -45,7 +45,7 @@ struct LazyImageView: View {
                     .frame(width: width, height: height, alignment: .center)
                     .clipped()
             case .loaded:
-                KFImage(viewModel.url)
+                KFImage.url(viewModel.url, cacheKey: key)
                     .resizable()
                     .placeholder { _ in
                         ProgressView()
