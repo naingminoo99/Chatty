@@ -216,7 +216,7 @@ private extension InputViewModel {
             .receive(on: DispatchQueue.global())
             .compactMap { [attachments] pickedMedia in
                 DraftMessage(
-                    text: attachments.text,
+                    text: self.text,
                     medias: attachments.medias + pickedMedia,
                     recording: attachments.recording,
                     replyMessage: attachments.replyMessage,
