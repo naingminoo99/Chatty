@@ -186,6 +186,10 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             .onChange(of: inputViewModel.showPicker) {
                 if $0 {
                     globalFocusState.focus = nil
+                } else {
+                    if inputViewModel.photoPickerItems.count > 0 {
+                        inputViewModel.send()
+                    }
                 }
             }
     }
