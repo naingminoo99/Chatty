@@ -52,7 +52,6 @@ struct LazyImageView: View {
                     }
                     .onFailureImage(UIImage(named: placeholderName ?? "placeholder"))
                     .fade(duration: 0.25)
-                    .cacheOriginalImage() // Cache original image
                     .aspectRatio(contentMode: contentMode)
                     .frame(width: width, height: height)
                     .clipped()
