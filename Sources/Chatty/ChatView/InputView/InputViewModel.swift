@@ -46,7 +46,6 @@ final class InputViewModel: ObservableObject {
             self?.state = .empty
             self?.text = ""
             self?.saveEditingClosure = nil
-            self?.attachments = InputViewAttachments()
             self?.subscribeValidation()
         }
     }
