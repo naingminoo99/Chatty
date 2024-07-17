@@ -17,7 +17,7 @@ let package = Package(
     dependencies: [
         .package(
             url: "https://github.com/siteline/swiftui-introspect",
-            from: "1.1.4"
+            from: "1.2.0"
         ),
         .package(
             url: "https://github.com/exyte/FloatingButton",
