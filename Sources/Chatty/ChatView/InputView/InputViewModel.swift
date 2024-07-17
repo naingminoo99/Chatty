@@ -216,17 +216,17 @@ private extension InputViewModel {
             .receive(on: DispatchQueue.global())
             .compactMap { [attachments] pickedMedia in
                 DraftMessage(
-                    text: self.text,
-                    medias: attachments.medias,
+                    text: attachments.text,
+                    medias: attachments.medias + pickedMedia,
                     recording: attachments.recording,
                     replyMessage: attachments.replyMessage,
                     createdAt: Date()
                 )
             }
             .sink { [weak self] draft in
-                self?.didSendMessage?(draft)
-                DispatchQueue.main.async { [weak self] in
+                DispatchQueue.main.async { [self, draft] in
                     self?.showActivityIndicator = false
+                    self?.didSendMessage?(draft)
                     self?.reset()
                 }
             }
