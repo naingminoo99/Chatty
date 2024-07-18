@@ -43,8 +43,8 @@ final class InputViewModel: ObservableObject {
             self?.attachments = InputViewAttachments()
             self?.photoPickerItems = []
             self?.showPicker = false
-            self?.state = .empty
             self?.text = ""
+            self?.state = .empty
             self?.saveEditingClosure = nil
             self?.subscribeValidation()
         }
