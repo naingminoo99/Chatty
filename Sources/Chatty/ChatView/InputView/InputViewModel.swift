@@ -44,9 +44,9 @@ final class InputViewModel: ObservableObject {
             self?.photoPickerItems = []
             self?.showPicker = false
             self?.text = ""
-            self?.state = .empty
             self?.saveEditingClosure = nil
             self?.subscribeValidation()
+            self?.state = .empty
         }
     }
 
