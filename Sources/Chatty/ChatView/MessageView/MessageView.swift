@@ -126,6 +126,9 @@ struct MessageView: View {
             if !message.user.isCurrentUser {
                 Text(message.user.name)
                     .font(.caption)
+                    .fontWeight(.semibold)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 5)
             }
             
             if !message.attachments.isEmpty {
