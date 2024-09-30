@@ -128,7 +128,8 @@ struct MessageView: View {
                     .font(.caption)
                     .fontWeight(.semibold)
                     .padding(.horizontal, 12)
-                    .padding(.vertical, 5)
+                    .padding(.top, 5)
+                    .padding(.bottom, -7)
             }
             
             if !message.attachments.isEmpty {
@@ -316,11 +317,11 @@ struct MessageView_Preview: PreviewProvider {
         status: .read,
         text: longMessage,
         attachments: [
-            Attachment.randomImage(),
-            Attachment.randomImage(),
-            Attachment.randomImage(),
-            Attachment.randomImage(),
-            Attachment.randomImage(),
+//            Attachment.randomImage(),
+//            Attachment.randomImage(),
+//            Attachment.randomImage(),
+//            Attachment.randomImage(),
+//            Attachment.randomImage(),
         ]
     )
 
