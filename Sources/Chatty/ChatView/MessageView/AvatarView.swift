@@ -3,14 +3,17 @@
 //
 
 import SwiftUI
+import MediaCache
 
 struct AvatarView: View {
+    
+    @Environment(\.urlLoader) private var urlLoader
 
     let avatarKey: String
     let avatarSize: CGFloat
 
     var body: some View {
-        LazyImageView(key: avatarKey)
+        LazyImageView(key: avatarKey, urlLoader: urlLoader)
         .viewSize(avatarSize)
         .clipShape(Circle())
     }

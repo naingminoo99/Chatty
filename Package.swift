@@ -28,12 +28,8 @@ let package = Package(
             from: "1.0.0"
         ),
         .package(
-            url: "https://github.com/onevcat/Kingfisher",
-            from: "7.0.0"
-        ),
-        .package(
-            url: "https://github.com/aws-amplify/amplify-swift",
-            from: "2.35.0"
+            url: "https://github.com/naingminoo99/MediaCache",
+            from: "1.0.1"
         )
     ],
     targets: [
@@ -43,8 +39,7 @@ let package = Package(
                 .product(name: "SwiftUIIntrospect", package: "swiftui-introspect"),
                 .product(name: "FloatingButton", package: "FloatingButton"),
                 .product(name: "ActivityIndicatorView", package: "ActivityIndicatorView"),
-                .product(name: "Kingfisher", package: "Kingfisher"),
-                .product(name: "Amplify", package: "amplify-swift")
+                .product(name: "MediaCache", package: "MediaCache"),
             ]
         ),
         .testTarget(

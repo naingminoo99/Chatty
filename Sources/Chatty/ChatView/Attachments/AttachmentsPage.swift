@@ -3,18 +3,20 @@
 //
 
 import SwiftUI
+import MediaCache
 
 struct AttachmentsPage: View {
 
     @EnvironmentObject var mediaPagesViewModel: FullscreenMediaPagesViewModel
     @Environment(\.chatTheme) private var theme
+    @Environment(\.urlLoader) private var urlLoader
 
     let attachment: Attachment
 
     var body: some View {
         if attachment.type == .image {
             let keyPath = "messageImages/" + attachment.full
-            LazyImageView(key: keyPath)
+            LazyImageView(key: keyPath, urlLoader: urlLoader)
         } else if attachment.type == .video {
             VideoView(viewModel: VideoViewModel(attachment: attachment))
         } else {

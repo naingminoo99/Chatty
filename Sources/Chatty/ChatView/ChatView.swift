@@ -9,7 +9,17 @@ import SwiftUI
 import FloatingButton
 import SwiftUIIntrospect
 import PhotosUI
+import MediaCache
 
+
+extension EnvironmentValues {
+    @Entry var urlLoader: URLLoader = ExampleURLLoader.shared
+}
+
+public class ChatStores {
+    public var urlLoader: URLLoader?
+    public static let shared = ChatStores()
+}
 
 public enum ChatType {
     case conversation // the latest message is at the bottom, new messages appear from the bottom
@@ -83,6 +93,9 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
     /// provide custom message view builder
     var messageBuilder: MessageBuilderClosure? = nil
 
+    /// provide custom URL Loader for Media Cache
+    var urlLoader: URLLoader
+
     /// provide custom input view builder
     var inputViewBuilder: InputViewBuilderClosure? = nil
 
@@ -141,7 +154,8 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
                 didSendMessage: @escaping (DraftMessage) -> Void,
                 messageBuilder: @escaping MessageBuilderClosure,
                 inputViewBuilder: @escaping InputViewBuilderClosure,
-                messageMenuAction: MessageMenuActionClosure?) {
+                messageMenuAction: MessageMenuActionClosure?,
+                urlLoader: URLLoader) {
         self.type = chatType
         self.didSendMessage = didSendMessage
         self.sections = ChatView.mapMessages(messages, chatType: chatType, replyMode: replyMode)
@@ -149,13 +163,16 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
         self.messageBuilder = messageBuilder
         self.inputViewBuilder = inputViewBuilder
         self.messageMenuAction = messageMenuAction
+        self.urlLoader = urlLoader
+        var chatStores = ChatStores.shared
+        chatStores.urlLoader = urlLoader
     }
 
     public var body: some View {
         mainView
             .background(theme.colors.mainBackground)
             .environmentObject(keyboardState)
-
+            .environment(\.urlLoader, urlLoader)
             .fullScreenCover(isPresented: $viewModel.fullscreenAttachmentPresented) {
                 let attachments = sections.flatMap { section in section.rows.flatMap { $0.message.attachments } }
                 let index = attachments.firstIndex { $0.id == viewModel.fullscreenAttachmentItem?.id }

@@ -3,12 +3,12 @@
 //
 
 import SwiftUI
-import Kingfisher
-import Amplify
+import MediaCache
 
 struct AttachmentCell: View {
 
     @Environment(\.chatTheme) private var theme
+    @Environment(\.urlLoader) private var urlLoader
 
     let attachment: Attachment
     let onTap: (Attachment) -> Void
@@ -39,11 +39,8 @@ struct AttachmentCell: View {
     }
 
     var content: some View {
-        //        AsyncImageView(url: attachment.thumbnail)
-        
-        // Key is js a name so add your message media patch here
         let keyWithPath = "messageImages/" + attachment.thumbnail
-        return LazyImageView(key: keyWithPath)
+        return LazyImageView(key: keyWithPath, urlLoader: urlLoader)
     }
 }
 

@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import MediaCache
 
 public enum InputViewStyle {
     case message
@@ -87,6 +88,7 @@ public struct InputViewAttachments {
 struct InputView: View {
 
     @Environment(\.chatTheme) private var theme
+    @Environment(\.urlLoader) private var urlLoader
 
     @ObservedObject var viewModel: InputViewModel
     var inputFieldId: UUID
@@ -288,7 +290,7 @@ struct InputView: View {
                     Spacer()
 
                     if let first = message.attachments.first {
-                        LazyImageView(key: first.thumbnail)
+                        LazyImageView(key: first.thumbnail, urlLoader: urlLoader)
                             .viewSize(30)
                             .cornerRadius(4)
                             .padding(.trailing, 16)
