@@ -295,7 +295,7 @@ extension View {
             .frame(width: message.attachments.isEmpty ? nil : MessageView.widthWithMedia + additionalMediaInset)
             .foregroundColor(message.user.isCurrentUser ? theme.colors.textDarkContext : theme.colors.textLightContext)
             .background {
-                if isReply || !message.attachments.isEmpty || message.recording != nil {
+                if isReply || !message.attachments.isEmpty || !message.text.isEmpty || message.recording != nil {
                     RoundedRectangle(cornerRadius: radius)
                         .foregroundColor(message.user.isCurrentUser ? theme.colors.myMessage : theme.colors.friendMessage)
                         .opacity(isReply ? 0.5 : 1)
@@ -325,13 +325,13 @@ struct MessageView_Preview: PreviewProvider {
         id: UUID().uuidString,
         user: stan,
         status: .read,
-        text: "",
+        text: longMessage,
         attachments: [
-            Attachment.randomImage(),
-            Attachment.randomImage(),
-            Attachment.randomImage(),
-            Attachment.randomImage(),
-            Attachment.randomImage(),
+//            Attachment.randomImage(),
+//            Attachment.randomImage(),
+//            Attachment.randomImage(),
+//            Attachment.randomImage(),
+//            Attachment.randomImage(),
         ]
     )
 
