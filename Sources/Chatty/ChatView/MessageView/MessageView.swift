@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import MediaCache
 
 struct MessageView: View {
 
@@ -294,7 +295,7 @@ extension View {
             .frame(width: message.attachments.isEmpty ? nil : MessageView.widthWithMedia + additionalMediaInset)
             .foregroundColor(message.user.isCurrentUser ? theme.colors.textDarkContext : theme.colors.textLightContext)
             .background {
-                if isReply || !message.text.isEmpty || message.recording != nil {
+                if isReply || !message.attachments.isEmpty || message.recording != nil {
                     RoundedRectangle(cornerRadius: radius)
                         .foregroundColor(message.user.isCurrentUser ? theme.colors.myMessage : theme.colors.friendMessage)
                         .opacity(isReply ? 0.5 : 1)
@@ -306,6 +307,14 @@ extension View {
 
 #if DEBUG
 struct MessageView_Preview: PreviewProvider {
+    
+    struct PrviewUrlLoader: URLLoader {
+        func loadURL(forKey key: String) async throws -> URL? {
+            let cleanKey = key.replacingOccurrences(of: "messageImages/", with: "")
+            return URL(string: cleanKey)
+        }
+    }
+
     static let stan = User(id: "stan", name: "Stan", avatarKey: "nil", isCurrentUser: false)
     static let john = User(id: "john", name: "John", avatarKey: "nil", isCurrentUser: true)
 
@@ -316,7 +325,7 @@ struct MessageView_Preview: PreviewProvider {
         id: UUID().uuidString,
         user: stan,
         status: .read,
-        text: longMessage,
+        text: "",
         attachments: [
             Attachment.randomImage(),
             Attachment.randomImage(),
@@ -350,6 +359,7 @@ struct MessageView_Preview: PreviewProvider {
                 showMessageTimeView: true,
                 font: UIFontMetrics.default.scaledFont(for: UIFont.systemFont(ofSize: 15))
             )
+            .environment(\.urlLoader, PrviewUrlLoader())
         }
     }
 }
