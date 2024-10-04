@@ -39,8 +39,7 @@ struct AttachmentCell: View {
     }
 
     var content: some View {
-        let keyWithPath = "messageImages/" + attachment.thumbnail
-        return LazyImageView(key: keyWithPath, urlLoader: urlLoader)
+        return LazyImageView(key: attachment.thumbnail, urlLoader: urlLoader)
     }
 }
 

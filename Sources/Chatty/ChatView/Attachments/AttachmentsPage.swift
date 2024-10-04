@@ -15,8 +15,7 @@ struct AttachmentsPage: View {
 
     var body: some View {
         if attachment.type == .image {
-            let keyPath = "messageImages/" + attachment.full
-            LazyImageView(key: keyPath, urlLoader: urlLoader)
+            LazyImageView(key: attachment.full, urlLoader: urlLoader)
         } else if attachment.type == .video {
             VideoView(viewModel: VideoViewModel(attachment: attachment))
         } else {
