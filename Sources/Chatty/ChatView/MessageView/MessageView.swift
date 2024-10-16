@@ -126,7 +126,6 @@ struct MessageView: View {
         VStack(alignment: .leading, spacing: 0) {
             if !message.attachments.isEmpty {
                 attachmentsView(message)
-                    .padding(.top, 7)
             }
 
             if !message.text.isEmpty {
