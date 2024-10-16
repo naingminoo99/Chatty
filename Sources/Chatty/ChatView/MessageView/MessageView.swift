@@ -124,10 +124,11 @@ struct MessageView: View {
     @ViewBuilder
     func bubbleView(_ message: Message) -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            if !message.user.isCurrentUser {
+            if !message.user.isCurrentUser && showAvatar {
                 Text(message.user.name)
                     .font(.caption)
                     .fontWeight(.semibold)
+                    .padding(.leading, 10)
             }
             VStack(alignment: .leading, spacing: 0) {
                 if !message.attachments.isEmpty {
