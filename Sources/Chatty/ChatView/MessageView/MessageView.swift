@@ -74,6 +74,12 @@ struct MessageView: View {
         || (chatType == .conversation && positionInUserGroup == .last)
         || (chatType == .comments && positionInUserGroup == .first)
     }
+    
+    var showName: Bool {
+        positionInUserGroup == .single
+        || (chatType == .conversation && positionInUserGroup == .first)
+        || (chatType == .comments && positionInUserGroup == .last)
+    }
 
     var topPadding: CGFloat {
         if chatType == .comments { return 0 }
@@ -124,7 +130,7 @@ struct MessageView: View {
     @ViewBuilder
     func bubbleView(_ message: Message) -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            if !message.user.isCurrentUser && showAvatar {
+            if !message.user.isCurrentUser && showName {
                 Text(message.user.name)
                     .font(.caption)
                     .fontWeight(.semibold)
