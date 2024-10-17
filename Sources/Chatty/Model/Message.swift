@@ -43,12 +43,18 @@ public struct Message: Identifiable, Hashable {
             }
         }
     }
+    
+    public enum MessageType: Equatable, Hashable {
+        case normal
+        case custom
+        case document
+    }
 
     public var id: String
     public var user: User
     public var status: Status?
     public var createdAt: Date
-
+    public var type: MessageType
     public var text: String
     public var attachments: [Attachment]
     public var recording: Recording?
@@ -59,6 +65,7 @@ public struct Message: Identifiable, Hashable {
     public init(id: String,
                 user: User,
                 status: Status? = nil,
+                type: MessageType = .normal,
                 createdAt: Date = Date(),
                 text: String = "",
                 attachments: [Attachment] = [],
@@ -68,6 +75,7 @@ public struct Message: Identifiable, Hashable {
         self.id = id
         self.user = user
         self.status = status
+        self.type = type
         self.createdAt = createdAt
         self.text = text
         self.attachments = attachments
