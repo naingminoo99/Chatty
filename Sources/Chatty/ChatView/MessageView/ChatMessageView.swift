@@ -27,8 +27,7 @@ struct ChatMessageView<MessageContent: View>: View {
     var body: some View {
         Group {
             if let messageBuilder = messageBuilder {
-                // Capture the result of the message builder
-                let messageContent = messageBuilder(
+                messageBuilder(
                     row.message,
                     row.positionInUserGroup,
                     row.commentsPosition,
@@ -36,36 +35,20 @@ struct ChatMessageView<MessageContent: View>: View {
                     viewModel.messageMenuAction()) { attachment in
                         self.viewModel.presentAttachmentFullScreen(attachment)
                     }
-
-                // Check if the builder provided an empty view
-                if let d = messageContent as? EmptyView {
-                    // If it's an EmptyView, show the default MessageView
-                    defaultMessageView
-                } else {
-                    // Otherwise, show the message content built by the builder
-                    messageContent
-                }
             } else {
-                // If there is no messageBuilder at all, fallback to the default MessageView
-                defaultMessageView
+                MessageView(
+                    message: row.message,
+                    positionInUserGroup: row.positionInUserGroup,
+                    chatType: chatType,
+                    avatarSize: avatarSize,
+                    tapAvatarClosure: tapAvatarClosure,
+                    messageUseMarkdown: messageUseMarkdown,
+                    isDisplayingMessageMenu: isDisplayingMessageMenu,
+                    showMessageTimeView: showMessageTimeView,
+                    font: messageFont)
             }
         }
-        .id(row.message.id)
-    }
-    // Default message view as a reusable property
-    @ViewBuilder
-    private var defaultMessageView: some View {
-        MessageView(
-            message: row.message,
-            positionInUserGroup: row.positionInUserGroup,
-            chatType: chatType,
-            avatarSize: avatarSize,
-            tapAvatarClosure: tapAvatarClosure,
-            messageUseMarkdown: messageUseMarkdown,
-            isDisplayingMessageMenu: isDisplayingMessageMenu,
-            showMessageTimeView: showMessageTimeView,
-            font: messageFont
-        )
         .environmentObject(viewModel)
+        .id(row.message.id)
     }
 }
