@@ -12,7 +12,7 @@ public struct MessageView: View {
 
     @Environment(\.chatTheme) private var theme
 
-    @ObservedObject var viewModel: ChatViewModel
+    @EnvironmentObject var viewModel: ChatViewModel
 
     let message: Message
     let positionInUserGroup: PositionInUserGroup
@@ -38,6 +38,28 @@ public struct MessageView: View {
 
     var font: UIFont
 
+    public init(
+        message: Message,
+        positionInUserGroup: PositionInUserGroup,
+        chatType: ChatType,
+        avatarSize: CGFloat,
+        tapAvatarClosure: ChatView.TapAvatarClosure?,
+        messageUseMarkdown: Bool,
+        isDisplayingMessageMenu: Bool,
+        showMessageTimeView: Bool,
+        font: UIFont
+    ) {
+        self.message = message
+        self.positionInUserGroup = positionInUserGroup
+        self.chatType = chatType
+        self.avatarSize = avatarSize
+        self.tapAvatarClosure = tapAvatarClosure
+        self.messageUseMarkdown = messageUseMarkdown
+        self.isDisplayingMessageMenu = isDisplayingMessageMenu
+        self.showMessageTimeView = showMessageTimeView
+        self.font = font
+    }
+    
     enum DateArrangement {
         case hstack, vstack, overlay
     }
@@ -352,7 +374,7 @@ struct MessageView_Preview: PreviewProvider {
             Color.yellow.ignoresSafeArea()
 
             MessageView(
-                viewModel: ChatViewModel(),
+//                viewModel: ChatViewModel(),
                 message: replyedMessage,
                 positionInUserGroup: .single,
                 chatType: .conversation,

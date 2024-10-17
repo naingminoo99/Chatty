@@ -37,7 +37,6 @@ struct ChatMessageView<MessageContent: View>: View {
                     }
             } else {
                 MessageView(
-                    viewModel: viewModel,
                     message: row.message,
                     positionInUserGroup: row.positionInUserGroup,
                     chatType: chatType,
@@ -46,7 +45,9 @@ struct ChatMessageView<MessageContent: View>: View {
                     messageUseMarkdown: messageUseMarkdown,
                     isDisplayingMessageMenu: isDisplayingMessageMenu,
                     showMessageTimeView: showMessageTimeView,
-                    font: messageFont)
+                    font: messageFont
+                )
+                .environmentObject(viewModel)
             }
         }
         .id(row.message.id)
