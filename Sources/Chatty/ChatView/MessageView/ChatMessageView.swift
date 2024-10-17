@@ -38,7 +38,7 @@ struct ChatMessageView<MessageContent: View>: View {
                     }
 
                 // Check if the builder provided an empty view
-                if messageContent is EmptyView {
+                if let d = messageContent as? EmptyView {
                     // If it's an EmptyView, show the default MessageView
                     defaultMessageView
                 } else {
