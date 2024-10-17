@@ -402,7 +402,6 @@ public struct ChatView<MessageContent: View, InputViewContent: View, MenuAction:
             .frame(height: menuButtonsSize.height + (cellFrames[row.id]?.height ?? 0), alignment: .top)
             .opacity(menuCellOpacity)
     }
-
     func menuActionClosure(_ message: Message) -> (MenuAction) -> () {
         if let messageMenuAction {
             return { action in
