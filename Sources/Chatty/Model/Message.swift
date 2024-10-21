@@ -56,6 +56,7 @@ public struct Message: Identifiable, Hashable {
     public var createdAt: Date
     public var type: MessageType
     public var text: String
+    public var customData: String?
     public var attachments: [Attachment]
     public var recording: Recording?
     public var replyMessage: ReplyMessage?
@@ -68,6 +69,7 @@ public struct Message: Identifiable, Hashable {
                 type: MessageType = .normal,
                 createdAt: Date = Date(),
                 text: String = "",
+                customData: String? = nil,
                 attachments: [Attachment] = [],
                 recording: Recording? = nil,
                 replyMessage: ReplyMessage? = nil) {
