@@ -80,6 +80,7 @@ public struct Message: Identifiable, Hashable {
         self.type = type
         self.createdAt = createdAt
         self.text = text
+        self.customData = customData
         self.attachments = attachments
         self.recording = recording
         self.replyMessage = replyMessage
