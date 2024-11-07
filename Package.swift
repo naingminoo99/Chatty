@@ -29,7 +29,7 @@ let package = Package(
         ),
         .package(
             url: "https://github.com/naingminoo99/MediaCache",
-            from: "1.2.0"
+            from: "1.2.1"
         )
     ],
     targets: [
